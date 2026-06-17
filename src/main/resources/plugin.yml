@@ -1,0 +1,17 @@
+name: TextAPI
+version: 0.1.0
+main: com.nolly.mc.textapi.TextAPIPlugin
+api-version: 1.21
+load: STARTUP
+
+authors: [Nolly]
+website: https://diversia.thenolle.com
+
+commands:
+  textapi:
+    description: TextAPI debug command
+    permission: com.nolly.mc.textapi.command
+
+permissions:
+  com.nolly.mc.textapi.command:
+    default: op
