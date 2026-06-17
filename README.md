@@ -15,6 +15,8 @@ It provides a MiniMessage-like syntax with placeholders, gradients, rainbow effe
 
 ---
 
+![Examples](.github/assets/examples.png)
+
 ## Features
 
 - Custom tag-based text parser (`<red>`, `<gradient>`, `<rainbow>`, etc.)
