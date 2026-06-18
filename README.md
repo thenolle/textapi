@@ -43,112 +43,176 @@ mvn clean package
 
 2. Place the generated jar in your server:
 
-```
-/plugins/TextAPI-1.0.1.jar
+```text
+/plugins/TextAPI-1.0.2.jar
 ```
 
 3. Restart the server.
 
 ---
 
-## Gradle / Maven Setup
+## Using TextAPI (GitHub Packages or Local Install)
 
-### Local installation (build & install to local repository)
+TextAPI is distributed via **GitHub Packages Maven registry**.
 
-#### Maven (local install)
+You have **two options**:
 
-From the project root:
-    ```
-    mvn clean install
-    ```
-
-This will install the artifact into your local Maven repository:
-    ```
-    ~/.m2/repository/com/nolly/mc/textapi/
-    ```
+* Install locally (`mvn install`)
+* Use GitHub Packages repository
 
 ---
 
-#### Gradle (publish to Maven Local)
+## Option 1 — Local install (simplest)
 
-If the project supports Maven Local publishing:
-    ```
-    gradle publishToMavenLocal
-    ```
+### Build and install into local Maven cache:
 
-or (recommended wrapper):
-    ```
-    ./gradlew publishToMavenLocal
-    ```
+```bash
+mvn clean install
+```
 
-This installs it into:
-    ```sh
-    ~/.m2/repository/
-    ```
+Then use dependency normally:
+
+```xml
+<dependency>
+    <groupId>com.nolly.mc</groupId>
+    <artifactId>textapi</artifactId>
+    <version>1.0.2</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+No repository required.
 
 ---
 
-## Using TextAPI as a dependency
+## Option 2 — GitHub Packages
 
-### Maven
+### Step 1: Add repository
 
-Add this to your `pom.xml`:
-    ```xml
-    <dependency>
-        <groupId>com.nolly.mc</groupId>
-        <artifactId>textapi</artifactId>
-        <version>1.0.1</version>
-        <scope>provided</scope>
-    </dependency>
-    ```
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/thenolle/textapi</url>
+    </repository>
+</repositories>
+```
 
-Make sure Maven local is available (for local builds):
-    ```xml
-    <repositories>
+---
+
+### Step 2: Add dependency
+
+```xml
+<dependency>
+    <groupId>com.nolly.mc</groupId>
+    <artifactId>textapi</artifactId>
+    <version>1.0.2</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+---
+
+### Step 3: Authenticate GitHub Packages
+
+Create or edit:
+
+```text
+~/.m2/settings.xml
+```
+
+```xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <activeProfiles>
+    <activeProfile>github</activeProfile>
+  </activeProfiles>
+
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
         <repository>
-            <id>mavenLocal</id>
-            <url>file://${user.home}/.m2/repository</url>
+          <id>central</id>
+          <url>https://repo.maven.apache.org/maven2</url>
         </repository>
-    </repositories>
-    ```
+
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/thenolle/textapi</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>YOUR_GITHUB_USERNAME</username>
+      <password>YOUR_GITHUB_TOKEN</password>
+    </server>
+  </servers>
+
+</settings>
+```
 
 ---
 
-### Gradle (Groovy DSL)
+### Step 4: Install dependency
 
-Add:
-    ```gradle
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    
-    dependencies {
-        compileOnly 'com.nolly.mc:textapi:1.0.1'
-    }
-    ```
+```bash
+mvn install
+```
 
 ---
 
-### Gradle (Kotlin DSL)
+## Gradle (Groovy DSL)
 
-Add:
-    ```kts
-    repositories {
-        mavenLocal()
-        mavenCentral()
+```gradle
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/thenolle/textapi")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
     }
-    
-    dependencies {
-        compileOnly("com.nolly.mc:textapi:1.0.1")
+}
+
+dependencies {
+    compileOnly 'com.nolly.mc:textapi:1.0.2'
+}
+```
+
+---
+
+## Gradle (Kotlin DSL)
+
+```kts
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/thenolle/textapi")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
     }
-    ```
+}
+
+dependencies {
+    compileOnly("com.nolly.mc:textapi:1.0.2")
+}
+```
 
 ---
 
 ## Configuration
-
-`config.yml`
 
 ```yml
 command:
@@ -167,45 +231,13 @@ command:
 
 ### Subcommands
 
-#### Parse & send text
-
 ```
 /text parse <message>
-```
-
-#### Preview components (debug)
-
-```
 /text components <message>
-```
-
-#### Tokenize input (debug)
-
-```
 /text tokens <message>
-```
-
-#### List placeholders
-
-```
 /text placeholders
-```
-
-#### Register placeholder
-
-```
 /text register <key> <value>
-```
-
-#### Unregister placeholder
-
-```
 /text unregister <key>
-```
-
-#### Examples
-
-```
 /text examples
 ```
 
@@ -258,7 +290,7 @@ command:
 
 ### Placeholders
 
-```txt
+```
 Hello {player}
 Online: {server_online}
 World: {player_world}
@@ -312,53 +344,19 @@ World: {player_world}
 
 ## API Usage
 
-### Initialize
-
-The plugin initializes automatically, but you can use the API directly:
-
 ```kt
 TextAPI.parse("<red>Hello {player}</red>", player)
-```
 
----
-
-### Send message
-
-```kt
 TextAPI.send(player, "<gradient:#ff0000:#00ff00>Hello</gradient>")
-```
 
----
-
-### Components
-
-```kt
 val components = TextAPI.components("<bold>Hello</bold>", player)
-```
 
----
-
-### Tokens
-
-```kt
 val tokens = TextAPI.tokens("<red>Hello</red>")
-```
 
----
-
-### Register placeholder
-
-```kt
-TextAPI.registerPlaceholder("rank") { player ->
-    if (player?.isOp == true) "Admin" else "User"
+TextAPI.registerPlaceholder("rank") {
+    if (it?.isOp == true) "Admin" else "User"
 }
-```
 
----
-
-### Unregister placeholder
-
-```kt
 TextAPI.unregisterPlaceholder("rank")
 ```
 
@@ -366,10 +364,10 @@ TextAPI.unregisterPlaceholder("rank")
 
 ## Performance Notes
 
-* Parsing is single-pass and lightweight
-* Gradient/rainbow expansion is per-character (CPU linear)
-* Placeholder resolution is cached per render context
-* TPS tracking uses rolling tick buffer (600 ticks)
+* Single-pass parsing
+* Linear gradient/rainbow expansion
+* Cached placeholder resolution per render context
+* Rolling TPS buffer (600 ticks)
 
 ---
 
