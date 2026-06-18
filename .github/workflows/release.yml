@@ -3,12 +3,13 @@ name: Release
 on:
   push:
     branches: [ "master" ]
-    paths:
-      - "pom.xml"
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -23,14 +24,20 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: maven
 
-      - name: Extract version from pom.xml
+      - name: Get Maven project version
         id: version
         run: |
-          echo "VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)" >> $GITHUB_OUTPUT
 
       - name: Build JAR
         run: mvn -B clean package
+
+      - name: Publish to GitHub Packages
+        run: mvn -B deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

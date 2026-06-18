@@ -44,10 +44,105 @@ mvn clean package
 2. Place the generated jar in your server:
 
 ```
-/plugins/TextAPI-0.1.0.jar
+/plugins/TextAPI-1.0.0.jar
 ```
 
 3. Restart the server.
+
+---
+
+## Gradle / Maven Setup
+
+### Local installation (build & install to local repository)
+
+#### Maven (local install)
+
+From the project root:
+    ```
+    mvn clean install
+    ```
+
+This will install the artifact into your local Maven repository:
+    ```
+    ~/.m2/repository/com/nolly/mc/textapi/
+    ```
+
+---
+
+#### Gradle (publish to Maven Local)
+
+If the project supports Maven Local publishing:
+    ```
+    gradle publishToMavenLocal
+    ```
+
+or (recommended wrapper):
+    ```
+    ./gradlew publishToMavenLocal
+    ```
+
+This installs it into:
+    ```sh
+    ~/.m2/repository/
+    ```
+
+---
+
+## Using TextAPI as a dependency
+
+### Maven
+
+Add this to your `pom.xml`:
+    ```xml
+    <dependency>
+        <groupId>com.nolly.mc</groupId>
+        <artifactId>textapi</artifactId>
+        <version>1.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+    ```
+
+Make sure Maven local is available (for local builds):
+    ```xml
+    <repositories>
+        <repository>
+            <id>mavenLocal</id>
+            <url>file://${user.home}/.m2/repository</url>
+        </repository>
+    </repositories>
+    ```
+
+---
+
+### Gradle (Groovy DSL)
+
+Add:
+    ```gradle
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    
+    dependencies {
+        compileOnly 'com.nolly.mc:textapi:1.0.0'
+    }
+    ```
+
+---
+
+### Gradle (Kotlin DSL)
+
+Add:
+    ```kts
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    
+    dependencies {
+        compileOnly("com.nolly.mc:textapi:1.0.0")
+    }
+    ```
 
 ---
 
