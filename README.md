@@ -44,7 +44,7 @@ mvn clean package
 2. Place the generated jar in your server:
 
 ```
-/plugins/TextAPI-1.0.0.jar
+/plugins/TextAPI-1.0.1.jar
 ```
 
 3. Restart the server.
@@ -97,7 +97,7 @@ Add this to your `pom.xml`:
     <dependency>
         <groupId>com.nolly.mc</groupId>
         <artifactId>textapi</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <scope>provided</scope>
     </dependency>
     ```
@@ -124,7 +124,7 @@ Add:
     }
     
     dependencies {
-        compileOnly 'com.nolly.mc:textapi:1.0.0'
+        compileOnly 'com.nolly.mc:textapi:1.0.1'
     }
     ```
 
@@ -140,7 +140,7 @@ Add:
     }
     
     dependencies {
-        compileOnly("com.nolly.mc:textapi:1.0.0")
+        compileOnly("com.nolly.mc:textapi:1.0.1")
     }
     ```
 
