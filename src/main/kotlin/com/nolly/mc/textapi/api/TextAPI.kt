@@ -4,6 +4,7 @@ import org.bukkit.entity.Player
 
 object TextAPI {
 	private lateinit var service: TextService
+
 	internal fun initialize(service: TextService) {
 		this.service = service
 	}
@@ -16,4 +17,7 @@ object TextAPI {
 
 	fun registerPlaceholder(key: String, resolver: (Player?) -> String?) = service.registerPlaceholder(key, resolver)
 	fun unregisterPlaceholder(key: String) = service.unregisterPlaceholder(key)
+
+	fun registerTag(tag: String) = service.registerTag(tag)
+	fun unregisterTag(tag: String) = service.unregisterTag(tag)
 }

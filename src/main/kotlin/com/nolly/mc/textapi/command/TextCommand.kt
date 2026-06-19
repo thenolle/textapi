@@ -37,7 +37,7 @@ class TextCommand(
 			"parse" -> {
 				val input = args.drop(1).joinToString(" ")
 				if (input.isBlank()) {
-					sender.sendMessage("§cUsage: /text parse <message>")
+					sender.sendMessage("§cUsage: /textapi parse <message>")
 					return true
 				}
 
@@ -85,11 +85,11 @@ class TextCommand(
 
 			// --------------------------------------------------
 			// REGISTER PLACEHOLDER
-			// /text register key value...
+			// /textapi register key value...
 			// --------------------------------------------------
 			"register" -> {
 				if (args.size < 3) {
-					sender.sendMessage("§cUsage: /text register <key> <value>")
+					sender.sendMessage("§cUsage: /textapi register <key> <value>")
 					return true
 				}
 
@@ -106,7 +106,7 @@ class TextCommand(
 			// --------------------------------------------------
 			"unregister" -> {
 				if (args.size < 2) {
-					sender.sendMessage("§cUsage: /text unregister <key>")
+					sender.sendMessage("§cUsage: /textapi unregister <key>")
 					return true
 				}
 
@@ -137,13 +137,13 @@ class TextCommand(
 	// --------------------------------------------------
 	private fun sendHelp(sender: CommandSender) {
 		sender.sendMessage("§d§lTextAPI Commands")
-		sender.sendMessage("§8/text parse <msg>")
-		sender.sendMessage("§8/text components <msg>")
-		sender.sendMessage("§8/text tokens <msg>")
-		sender.sendMessage("§8/text placeholders")
-		sender.sendMessage("§8/text register <key> <value>")
-		sender.sendMessage("§8/text unregister <key>")
-		sender.sendMessage("§8/text examples")
+		sender.sendMessage("§8/textapi parse <msg>")
+		sender.sendMessage("§8/textapi components <msg>")
+		sender.sendMessage("§8/textapi tokens <msg>")
+		sender.sendMessage("§8/textapi placeholders")
+		sender.sendMessage("§8/textapi register <key> <value>")
+		sender.sendMessage("§8/textapi unregister <key>")
+		sender.sendMessage("§8/textapi examples")
 	}
 
 	// --------------------------------------------------
@@ -211,7 +211,7 @@ class TextCommand(
 
 		// -----------------------------
 		// REGISTER PLACEHOLDER
-		// /text register <key> <value>
+		// /textapi register <key> <value>
 		// -----------------------------
 		if (sub == "register") {
 			return when (args.size) {

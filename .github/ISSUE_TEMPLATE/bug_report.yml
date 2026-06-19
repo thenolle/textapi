@@ -16,7 +16,7 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. Run /text parse ...
+        1. Run /textapi parse ...
         2. ...
         3. Error occurs
     validations:
@@ -32,7 +32,7 @@ body:
     id: version
     attributes:
       label: TextAPI version
-      placeholder: 1.0.2
+      placeholder: 1.0.3
 
   - type: input
     id: mcversion

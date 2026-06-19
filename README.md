@@ -1,17 +1,18 @@
 # TextAPI
 
-![Java](https://img.shields.io/badge/Java-21-007396?style=for-the-badge&logo=openjdk&logoColor=white)
-![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-007396?style=for-the-badge\&logo=openjdk\&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-7F52FF?style=for-the-badge\&logo=kotlin\&logoColor=white)
 ![Spigot](https://img.shields.io/badge/Spigot-1.21+-ED8106?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-WTFPL-brightgreen?style=for-the-badge)
 
-![GitHub Repo](https://img.shields.io/badge/GitHub-thenolle%2Ftextapi-181717?style=for-the-badge&logo=github)
+![GitHub Repo](https://img.shields.io/badge/GitHub-thenolle%2Ftextapi-181717?style=for-the-badge\&logo=github)
 ![GitHub Release](https://img.shields.io/github/v/release/thenolle/textapi?style=for-the-badge)
 ![Downloads](https://img.shields.io/github/downloads/thenolle/textapi/total?style=for-the-badge)
 ![Issues](https://img.shields.io/github/issues/thenolle/textapi?style=for-the-badge)
 
-TextAPI is a high-performance text formatting and parsing system for Spigot 1.21+ servers.  
-It provides a MiniMessage-like syntax with placeholders, gradients, rainbow effects, hover/click events, and a fully extensible placeholder API.
+TextAPI is a high-performance text formatting and parsing system for Spigot 1.21+ servers.
+
+It provides a MiniMessage-like syntax with placeholders, colors, gradients, rainbow effects, hover/click events, runtime tag registration, and a fully extensible API.
 
 ---
 
@@ -19,75 +20,76 @@ It provides a MiniMessage-like syntax with placeholders, gradients, rainbow effe
 
 ## Features
 
-- Custom tag-based text parser (`<red>`, `<gradient>`, `<rainbow>`, etc.)
-- Placeholder system (`{player}`, `{server_online}`, custom placeholders)
-- Click and hover events (Bungee Chat API)
-- Gradient and rainbow text rendering
-- Pride gradient presets
-- Token-level parsing API
-- Full command-based debugging tools
-- Runtime placeholder registration
-- TPS placeholder support
-- Component + legacy string output
-- Tab-complete enabled `/text` command
+* Custom tag-based parser
+* Placeholder system
+* Runtime placeholder registration
+* Runtime tag registration
+* Click and hover events
+* Gradient rendering
+* Rainbow rendering
+* Pride gradient presets
+* Token-level parser API
+* Legacy string output
+* Component output
+* Debug commands
+* TPS placeholder support
+* Tab-complete enabled `/text` command
 
 ---
 
 ## Installation
 
-1. Build the plugin:
+### Build
 
 ```bash
 mvn clean package
-````
-
-2. Place the generated jar in your server:
-
-```text
-/plugins/TextAPI-1.0.2.jar
 ```
 
-3. Restart the server.
+### Install
+
+Place the generated jar inside:
+
+```text
+/plugins/TextAPI-1.0.3.jar
+```
+
+Restart the server.
 
 ---
 
-## Using TextAPI (GitHub Packages or Local Install)
+## Using TextAPI
 
-TextAPI is distributed via **GitHub Packages Maven registry**.
+TextAPI can be consumed through:
 
-You have **two options**:
-
-* Install locally (`mvn install`)
-* Use GitHub Packages repository
+* Local Maven install
+* GitHub Packages
 
 ---
 
-## Option 1 — Local install (simplest)
+## Option 1 — Local Install
 
-### Build and install into local Maven cache:
+Build and install locally:
 
 ```bash
 mvn clean install
 ```
 
-Then use dependency normally:
+Dependency:
 
 ```xml
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <scope>provided</scope>
 </dependency>
 ```
-
-No repository required.
 
 ---
 
 ## Option 2 — GitHub Packages
 
-### Step 1: Add repository
+### Repository
 
 ```xml
 <repositories>
@@ -98,86 +100,73 @@ No repository required.
 </repositories>
 ```
 
----
-
-### Step 2: Add dependency
+### Dependency
 
 ```xml
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <scope>provided</scope>
 </dependency>
 ```
 
----
+### Authentication
 
-### Step 3: Authenticate GitHub Packages
-
-Create or edit:
-
-```text
-~/.m2/settings.xml
-```
+`~/.m2/settings.xml`
 
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-  <activeProfiles>
-    <activeProfile>github</activeProfile>
-  </activeProfiles>
+    <activeProfiles>
+        <activeProfile>github</activeProfile>
+    </activeProfiles>
 
-  <profiles>
-    <profile>
-      <id>github</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
+    <profiles>
+        <profile>
+            <id>github</id>
 
-        <repository>
-          <id>github</id>
-          <url>https://maven.pkg.github.com/thenolle/textapi</url>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                </repository>
 
-  <servers>
-    <server>
-      <id>github</id>
-      <username>YOUR_GITHUB_USERNAME</username>
-      <password>YOUR_GITHUB_TOKEN</password>
-    </server>
-  </servers>
+                <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/thenolle/textapi</url>
+
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <servers>
+        <server>
+            <id>github</id>
+            <username>YOUR_GITHUB_USERNAME</username>
+            <password>YOUR_GITHUB_TOKEN</password>
+        </server>
+    </servers>
 
 </settings>
 ```
 
 ---
 
-### Step 4: Install dependency
-
-```bash
-mvn install
-```
-
----
-
-## Gradle (Groovy DSL)
+## Gradle (Groovy)
 
 ```gradle
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/thenolle/textapi")
+
         credentials {
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -186,18 +175,19 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.nolly.mc:textapi:1.0.2'
+    compileOnly 'com.nolly.mc:textapi:1.0.3'
 }
 ```
 
 ---
 
-## Gradle (Kotlin DSL)
+## Gradle (Kotlin)
 
 ```kts
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/thenolle/textapi")
+
         credentials {
             username = System.getenv("GITHUB_ACTOR")
             password = System.getenv("GITHUB_TOKEN")
@@ -206,7 +196,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.nolly.mc:textapi:1.0.2")
+    compileOnly("com.nolly.mc:textapi:1.0.3")
 }
 ```
 
@@ -223,22 +213,22 @@ command:
 
 ## Commands
 
-### Main command
+### Main Command
 
-```
+```text
 /text
 ```
 
 ### Subcommands
 
-```
-/text parse <message>
-/text components <message>
-/text tokens <message>
-/text placeholders
-/text register <key> <value>
-/text unregister <key>
-/text examples
+```text
+/textapi parse <message>
+/textapi components <message>
+/textapi tokens <message>
+/textapi placeholders
+/textapi register <key> <value>
+/textapi unregister <key>
+/textapi examples
 ```
 
 ---
@@ -250,50 +240,124 @@ command:
 ```txt
 <red>Red</red>
 <gold>Gold</gold>
-<#ff5500>Hex color</#ff5500>
+<green>Green</green>
+<#ff5500>Hex Color</#ff5500>
 ```
 
 ### Gradients
 
 ```txt
-<gradient:#ff0000:#00ff00>Gradient text</gradient>
+<gradient:#ff0000:#00ff00>Gradient Text</gradient>
 ```
 
 ### Rainbow
 
 ```txt
-<rainbow>Rainbow text</rainbow>
+<rainbow>Rainbow Text</rainbow>
 ```
 
 ### Decorations
 
 ```txt
 <bold>Bold</bold>
+
 <italic>Italic</italic>
+
 <underlined>Underline</underlined>
+
 <strikethrough>Strike</strikethrough>
+
+<obfuscated>Magic</obfuscated>
 ```
 
-### Hover events
+### Disable Decorations
 
 ```txt
-<hover:show_text:Hello world>Hover me</hover>
+<bold>
+    Bold
+    <!bold>Not Bold</!bold>
+    Bold Again
+</bold>
 ```
 
-### Click events
+### Hover Events
 
 ```txt
-<click:run_command:/spawn>Run command</click>
-<click:suggest_command:/msg >Suggest command</click>
-<click:open_url:https://example.com>Open URL</click>
+<hover:show_text:Hello World>
+    Hover Me
+</hover>
+```
+
+### Click Events
+
+```txt
+<click:run_command:/spawn>
+    Run Command
+</click>
+
+<click:suggest_command:/msg >
+    Suggest Command
+</click>
+
+<click:open_url:https://example.com>
+    Open URL
+</click>
+
+<click:copy_to_clipboard:Copied Text>
+    Copy
+</click>
+```
+
+### Insertions
+
+```txt
+<insert:Hidden Text>
+    Hover + Shift Click
+</insert>
 ```
 
 ### Placeholders
 
-```
+```txt
 Hello {player}
+
 Online: {server_online}
+
 World: {player_world}
+```
+
+---
+
+## Pride Gradients
+
+```txt
+<pride>Pride</pride>
+
+<trans>Trans</trans>
+
+<bi>Bisexual</bi>
+
+<lesbian>Lesbian</lesbian>
+
+<nonbinary>Nonbinary</nonbinary>
+
+<pan>Pansexual</pan>
+
+<ace>Asexual</ace>
+
+<aro>Aromantic</aro>
+
+<genderfluid>Genderfluid</genderfluid>
+
+<agender>Agender</agender>
+
+<intersex>Intersex</intersex>
+
+<polyam>Polyamorous</polyam>
+
+<demi>Demisexual</demi>
+
+<genderqueer>Genderqueer</genderqueer>
 ```
 
 ---
@@ -305,6 +369,7 @@ World: {player_world}
 * `{player}`
 * `{player_name}`
 * `{player_uuid}`
+* `{player_display}`
 * `{player_world}`
 * `{player_x}`
 * `{player_y}`
@@ -344,47 +409,150 @@ World: {player_world}
 
 ## API Usage
 
+### Parsing
+
 ```kt
-TextAPI.parse("<red>Hello {player}</red>", player)
+val text = TextAPI.parse(
+	"<red>Hello {player}</red>",
+	player
+)
+```
 
-TextAPI.send(player, "<gradient:#ff0000:#00ff00>Hello</gradient>")
+### Components
 
-val components = TextAPI.components("<bold>Hello</bold>", player)
+```kt
+val components = TextAPI.components(
+	"<bold>Hello</bold>",
+	player
+)
+```
 
-val tokens = TextAPI.tokens("<red>Hello</red>")
+### Sending Messages
 
-TextAPI.registerPlaceholder("rank") {
-    if (it?.isOp == true) "Admin" else "User"
+```kt
+TextAPI.send(
+	player,
+	"<gradient:#ff0000:#00ff00>Hello</gradient>"
+)
+```
+
+### Tokens
+
+```kt
+val tokens = TextAPI.tokens(
+	"<red>Hello</red>"
+)
+```
+
+---
+
+## Placeholder Registration
+
+### Register
+
+```kt
+TextAPI.registerPlaceholder("rank") { player ->
+	if (player?.isOp == true) {
+		"Admin"
+	} else {
+		"User"
+	}
 }
+```
 
+Usage:
+
+```txt
+Hello {rank}
+```
+
+### Unregister
+
+```kt
 TextAPI.unregisterPlaceholder("rank")
 ```
 
 ---
 
+## Runtime Tag Registration
+
+Tags can be registered dynamically so the parser recognizes them as tags rather than placeholders.
+
+### Register
+
+```kt
+TextAPI.registerTag("mytag")
+```
+
+Usage:
+
+```txt
+<mytag>Hello</mytag>
+```
+
+### Unregister
+
+```kt
+TextAPI.unregisterTag("mytag")
+```
+
+### Check Behavior
+
+Without registration:
+
+```txt
+<mytag>
+```
+
+is treated as:
+
+```txt
+{mytag}
+```
+
+After registration:
+
+```txt
+<mytag>
+```
+
+is parsed as a tag token.
+
+This allows plugin developers to build custom renderers, preprocessors, extensions, or future tag implementations without modifying TextAPI internals.
+
+---
+
 ## Performance Notes
 
-* Single-pass parsing
-* Linear gradient/rainbow expansion
+* Single-pass tokenization
+* Linear parsing complexity
+* Linear gradient expansion
+* Linear rainbow expansion
 * Cached placeholder resolution per render context
-* Rolling TPS buffer (600 ticks)
+* Rolling TPS history buffer
+* No reflection
+* Minimal allocations during rendering
 
 ---
 
 ## Permissions
 
-```
+```text
 com.nolly.mc.textapi.command
 ```
 
-Default: `op`
+Default:
+
+```text
+op
+```
 
 ---
 
 ## Compatibility
 
 * Spigot 1.21+
-* Java 21
+* Java 21+
 * Kotlin 2.4+
 * Bungee Chat Component API
 
@@ -394,5 +562,7 @@ Default: `op`
 
 <a href="http://www.wtfpl.net/">
 <img src="http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png"
-width="80" height="15" alt="WTFPL" />
+width="80"
+height="15"
+alt="WTFPL" />
 </a>

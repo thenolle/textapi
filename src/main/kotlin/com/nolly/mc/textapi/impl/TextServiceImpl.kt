@@ -41,4 +41,12 @@ class TextServiceImpl : TextService {
 	override fun unregisterPlaceholder(key: String) {
 		TextPlaceholders.unregister(key)
 	}
+
+	override fun registerTag(tag: String) {
+		TextTag.register(tag)
+	}
+
+	override fun unregisterTag(tag: String) {
+		TextTag.unregister(tag)
+	}
 }

@@ -3,6 +3,9 @@ package com.nolly.mc.textapi.impl
 import net.md_5.bungee.api.ChatColor
 
 internal object TextTag {
+
+	private val customTags = mutableSetOf<String>()
+
 	private val namedColors: Map<String, ChatColor> = mapOf(
 		"black" to ChatColor.BLACK,
 		"dark_blue" to ChatColor.DARK_BLUE,
@@ -41,20 +44,43 @@ internal object TextTag {
 		"genderqueer" to listOf("#B57EDC", "#FFFFFF", "#4A8123")
 	)
 
+	fun register(tag: String) {
+		customTags += normalize(tag)
+	}
+
+	fun unregister(tag: String) {
+		customTags -= normalize(tag)
+	}
+
+	fun isRegistered(tag: String): Boolean =
+		normalize(tag) in customTags
+
+	fun registered(): Set<String> =
+		customTags.toSet()
+
 	fun resolveColor(value: String): ChatColor? {
 		val n = normalize(value)
 		namedColors[n]?.let { return it }
-		if (n.startsWith("#") && n.length == 7) return runCatching { ChatColor.of(n) }.getOrNull()
+		if (n.startsWith("#") && n.length == 7) {
+			return runCatching { ChatColor.of(n) }.getOrNull()
+		}
 		return null
 	}
 
-	fun isColorTag(name: String): Boolean = normalize(name).let { namedColors.containsKey(it) }
+	fun isColorTag(name: String): Boolean =
+		normalize(name).let { namedColors.containsKey(it) }
 
-	fun isColorAlias(name: String): Boolean = normalize(name) in setOf("color", "colour", "c")
+	fun isColorAlias(name: String): Boolean =
+		normalize(name) in setOf("color", "colour", "c")
 
-	fun isDecorationTag(name: String): Boolean = normalize(name) in decorationAliases
+	fun isDecorationTag(name: String): Boolean =
+		normalize(name) in decorationAliases
 
-	fun applyDecoration(style: TextStyle, name: String, enabled: Boolean): TextStyle = when (normalize(name)) {
+	fun applyDecoration(
+		style: TextStyle,
+		name: String,
+		enabled: Boolean
+	): TextStyle = when (normalize(name)) {
 		"bold", "b" -> style.copy(bold = enabled)
 		"italic", "em", "i" -> style.copy(italic = enabled)
 		"underlined", "underline", "u" -> style.copy(underlined = enabled)
@@ -63,7 +89,8 @@ internal object TextTag {
 		else -> style
 	}
 
-	fun normalize(s: String): String = s.trim().lowercase()
+	fun normalize(s: String): String =
+		s.trim().lowercase()
 
 	private val decorationAliases: Set<String> = setOf(
 		"bold", "b",
