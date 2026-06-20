@@ -4,20 +4,24 @@ internal class TextParser {
 	fun parse(input: String): List<TextToken> {
 		val tokens = mutableListOf<TextToken>()
 		val buffer = StringBuilder()
+
 		fun flush() {
 			if (buffer.isNotEmpty()) {
 				tokens += TextToken.Text(buffer.toString())
 				buffer.setLength(0)
 			}
 		}
+
 		var i = 0
 		while (i < input.length) {
 			val c = input[i]
+
 			if (c == '\\' && i + 1 < input.length) {
 				buffer.append(input[i + 1])
 				i += 2
 				continue
 			}
+
 			if (c == '{') {
 				val close = input.indexOf('}', i + 1)
 				if (close == -1) {
@@ -36,17 +40,32 @@ internal class TextParser {
 				i = close + 1
 				continue
 			}
+
 			if (c == '<') {
-				val close = input.indexOf('>', i + 1)
-				if (close == -1) {
+				var j = i + 1
+				var quote: Char? = null
+				var closeIdx = -1
+				while (j < input.length) {
+					val cj = input[j]
+					when {
+						quote != null -> if (cj == quote) quote = null
+						cj == '\'' || cj == '"' -> quote = cj
+						cj == '>' -> { closeIdx = j; }
+					}
+					if (closeIdx != -1) break
+					j++
+				}
+
+				if (closeIdx == -1) {
 					buffer.append(c)
 					i++
 					continue
 				}
-				val raw = input.substring(i + 1, close).trim()
+
+				val raw = input.substring(i + 1, closeIdx).trim()
 				if (raw.isEmpty()) {
-					buffer.append(input.substring(i, close + 1))
-					i = close + 1
+					buffer.append(input.substring(i, closeIdx + 1))
+					i = closeIdx + 1
 					continue
 				}
 				flush()
@@ -74,12 +93,14 @@ internal class TextParser {
 						tokens += TextToken.Placeholder(raw)
 					}
 				}
-				i = close + 1
+				i = closeIdx + 1
 				continue
 			}
+
 			buffer.append(c)
 			i++
 		}
+
 		flush()
 		return tokens
 	}
@@ -93,9 +114,14 @@ internal class TextParser {
 		"reset",
 		"newline", "br",
 		"gradient",
+		"transition",
 		"rainbow",
+		"shadow",
+		"key",
+		"lang", "tr", "translate",
+		"lang_or", "tr_or", "translate_or",
 		"color", "colour", "c",
-		"click", "hover", 	"insert",
+		"click", "hover", "insert",
 		"bold", "b",
 		"italic", "em", "i",
 		"underlined", "underline", "u",

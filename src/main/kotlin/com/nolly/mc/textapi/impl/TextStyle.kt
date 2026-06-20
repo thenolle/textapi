@@ -3,9 +3,11 @@ package com.nolly.mc.textapi.impl
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
+import java.awt.Color
 
 data class TextStyle(
 	val color: ChatColor? = null,
+	val shadowColor: Color? = null,
 	val bold: Boolean = false,
 	val italic: Boolean = false,
 	val underlined: Boolean = false,

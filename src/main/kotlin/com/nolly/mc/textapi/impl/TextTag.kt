@@ -1,8 +1,7 @@
 package com.nolly.mc.textapi.impl
 
 import net.md_5.bungee.api.ChatColor
-
-
+import java.awt.Color
 
 object TextTag {
 	fun interface TagHandler {
@@ -95,6 +94,86 @@ object TextTag {
 	}
 
 	fun isColorTag(name: String): Boolean = normalize(name).let { namedColors.containsKey(it) }
+
+	fun applyShadow(style: TextStyle, shadow: Color?): TextStyle {
+		return style.copy(shadowColor = shadow)
+	}
+
+	fun resolveShadowColor(value: String, alpha: Float? = null): Color? {
+		val n = normalize(value)
+		val base = resolveColor(n) ?: return null
+		val awt = base.color ?: return null
+		val resolvedAlpha = when {
+			alpha != null -> (alpha.coerceIn(0f, 1f) * 255f).toInt()
+			awt.alpha != 255 -> awt.alpha
+			else -> (0.25f * 255f).toInt()
+		}
+		return Color(awt.red, awt.green, awt.blue, resolvedAlpha)
+	}
+
+	fun transparentShadow(): Color = Color(0, 0, 0, 0)
+
+	fun resolveKeybind(value: String): String? {
+		val n = value.trim()
+		if (n.isEmpty()) return null
+		if (n.startsWith("key.")) return n
+		return "key.$n"
+	}
+
+	fun parseTranslatable(args: String): Pair<String, List<String>>? {
+		val parts = splitTopLevel(args)
+		if (parts.isEmpty()) return null
+		val key = parts.first().trim()
+		if (key.isEmpty()) return null
+		val withValues = parts.drop(1).map { unquote(it.trim()) }
+		return key to withValues
+	}
+
+	private fun splitTopLevel(input: String): List<String> {
+		val result = mutableListOf<String>()
+		val sb = StringBuilder()
+		var quote: Char? = null
+		var i = 0
+		while (i < input.length) {
+			val c = input[i]
+			when {
+				quote != null -> {
+					if (c == quote) quote = null else sb.append(c)
+				}
+				c == '\'' || c == '"' -> quote = c
+				c == ':' -> {
+					result.add(sb.toString())
+					sb.setLength(0)
+				}
+				else -> sb.append(c)
+			}
+			i++
+		}
+		result.add(sb.toString())
+		return result
+	}
+
+
+	private fun unquote(s: String): String {
+		if (s.length >= 2) {
+			val first = s.first()
+			val last = s.last()
+			if ((first == '\'' && last == '\'') || (first == '"' && last == '"')) {
+				return s.substring(1, s.length - 1)
+			}
+		}
+		return s
+	}
+
+	fun parseTranslatableOr(args: String): Triple<String, String, List<String>>? {
+		val parts = splitTopLevel(args)
+		if (parts.size < 2) return null
+		val key = parts[0].trim()
+		if (key.isEmpty()) return null
+		val fallback = unquote(parts[1].trim())
+		val withValues = parts.drop(2).map { unquote(it.trim()) }
+		return Triple(key, fallback, withValues)
+	}
 
 	fun isColorAlias(name: String): Boolean = normalize(name) in setOf("color", "colour", "c")
 

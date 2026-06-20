@@ -174,9 +174,9 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 					return true
 				}
 				sender.sendMessage("§7Input: §f$input")
-				sender.sendMessage("§7Raw parse: §f${service.parse(input, sender as? Player, emptyMap())}")
+				sender.sendMessage("§7Parsed text: §f${service.parse(input, sender as? Player, emptyMap())}")
 				if (sender is Player) {
-					sender.sendMessage("§7Rendered:")
+					sender.sendMessage("§7Rendered preview:")
 					service.send(sender, input)
 				}
 			}
@@ -275,6 +275,8 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 	private fun sendExamples(sender: CommandSender) {
 		sender.sendMessage("§d§lTextAPI Examples")
 		sender.sendMessage("§7Colors:          §f<red>Red</red> <#ff4800>Hex</#ff4800>")
+		sender.sendMessage("§7Shadow:          §f<shadow:yellow>Hello <shadow:aqua:0.5>World</shadow>!")
+		sender.sendMessage("§7Shadow off:      §f<!shadow> disables shadow")
 		sender.sendMessage("§7Gradient:        §f<gradient:#ff0000:#00ff00>Gradient</gradient>")
 		sender.sendMessage("§7Rainbow:         §f<rainbow>Rainbow</rainbow>")
 		sender.sendMessage("§7Pride:           §f<pride>Pride</pride> <trans>Trans</trans>")
@@ -310,7 +312,7 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 			suggestions += listOf(
 				"<red>", "<gold>", "<green>", "<aqua>", "<blue>", "<light_purple>", "<yellow>", "<white>",
 				"<#ff4800>", "<bold>", "<italic>", "<underlined>", "<strikethrough>", "<obfuscated>",
-				"<gradient:#ff0000:#0000ff>", "<rainbow>",
+				"<gradient:#ff0000:#0000ff>", "<rainbow>", "<shadow:yellow>", "<!shadow>",
 				"<pride>", "<trans>", "<bi>", "<lesbian>", "<nonbinary>", "<pan>",
 				"<hover:show_text:>", "<click:run_command:>", "<click:suggest_command:>",
 				"<click:open_url:>", "<insert:>", "<reset>"
