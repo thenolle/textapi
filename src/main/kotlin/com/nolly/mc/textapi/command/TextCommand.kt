@@ -25,6 +25,49 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 			return true
 		}
 		when (args[0].lowercase()) {
+			"chat" -> {
+				val input = args.drop(1).joinToString(" ")
+				if (input.isBlank()) {
+					sender.sendMessage("§cUsage: /textapi chat <message>")
+					return true
+				}
+				if (sender is Player) {
+					TextAPI.send(sender, input)
+				} else {
+					sender.sendMessage(TextAPI.parse(input))
+				}
+			}
+			"actionbar" -> {
+				if (sender !is Player) {
+					sender.sendMessage("§cThis command requires a player.")
+					return true
+				}
+				val input = args.drop(1).joinToString(" ")
+				if (input.isBlank()) {
+					sender.sendMessage("§cUsage: /textapi actionbar <message>")
+					return true
+				}
+				TextAPI.actionbar(sender, input)
+			}
+			"title" -> {
+				if (sender !is Player) {
+					sender.sendMessage("§cThis command requires a player.")
+					return true
+				}
+				val raw = args.drop(1).joinToString(" ")
+				if (raw.isBlank()) {
+					sender.sendMessage("§cUsage: /textapi title <title> [| subtitle]")
+					return true
+				}
+				val split = raw.split("|", limit = 2)
+				val title = split[0].trim()
+				val subtitle = split.getOrNull(1)?.trim()
+				TextAPI.title(
+					sender,
+					title,
+					subtitle
+				)
+			}
 			"parse" -> {
 				val input = args.drop(1).joinToString(" ")
 				if (input.isBlank()) {
@@ -176,8 +219,12 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 				sender.sendMessage("§7Input: §f$input")
 				sender.sendMessage("§7Parsed text: §f${service.parse(input, sender as? Player, emptyMap())}")
 				if (sender is Player) {
-					sender.sendMessage("§7Rendered preview:")
-					service.send(sender, input)
+					sender.sendMessage("§7Chat:")
+					TextAPI.send(sender, input)
+					sender.sendMessage("§7Actionbar:")
+					TextAPI.actionbar(sender, input)
+					sender.sendMessage("§7Title:")
+					TextAPI.title(sender, input)
 				}
 			}
 			"test" -> {
@@ -197,10 +244,7 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 		fun section(title: String) = service.send(player, "\n§8§m                    §r §d§l$title §8§m                    §r")
 		fun row(label: String, input: String) = service.send(player, "§8» §7$label§8: $input")
 		section("COLORS")
-		row(
-			"named",
-			"<red>red</red> <gold>gold</gold> <green>green</green> <aqua>aqua</aqua> <blue>blue</blue> <light_purple>purple</light_purple>"
-		)
+		row("named", "<red>red</red> <gold>gold</gold> <green>green</green> <aqua>aqua</aqua> <blue>blue</blue> <light_purple>purple</light_purple>")
 		row("hex", "<#ff4800>hex orange</#ff4800> <#00cfff>hex cyan</#00cfff>")
 		row("nested", "<red>outer <gold>inner</gold> back</red>")
 		row("color alias", "<color:#ff00ff>color tag</color>")
@@ -270,6 +314,10 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 		sender.sendMessage("§8/textapi register tag <name> <color> [bold] [italic] [underline] [strikethrough] [obfuscated]")
 		sender.sendMessage("§8/textapi register gradient <name> <#hex1> <#hex2> [#hex3...]")
 		sender.sendMessage("§8/textapi unregister <placeholder|tag|gradient> <key>")
+		sender.sendMessage("§8/textapi chat <msg>             §7- Send chat message")
+		sender.sendMessage("§8/textapi actionbar <msg>        §7- Send actionbar")
+		sender.sendMessage("§8/textapi title <msg>            §7- Send title")
+		sender.sendMessage("§8/textapi title <t> | <s>        §7- Title + subtitle")
 	}
 
 	private fun sendExamples(sender: CommandSender) {
@@ -286,6 +334,10 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 		sender.sendMessage("§7Placeholders:    §fHello {player} — TPS: {server_tps}")
 		sender.sendMessage("§7Custom tag:      §f/textapi register tag vip #ffd700 bold")
 		sender.sendMessage("§7Custom gradient: §f/textapi register gradient sunset #ff6600 #ff0099 #aa00ff")
+		sender.sendMessage("§7Chat:            §f/textapi chat <red>Hello</red>")
+		sender.sendMessage("§7Actionbar:       §f/textapi actionbar <gold>Cooldown ready</gold>")
+		sender.sendMessage("§7Title:           §f/textapi title <green>Welcome")
+		sender.sendMessage("§7Subtitle:        §f/textapi title <green>Welcome | <gray>Enjoy your stay")
 	}
 
 	override fun onTabComplete(
@@ -301,12 +353,20 @@ class TextCommand(private val service: TextService) : CommandExecutor, TabComple
 				listOf(
 					"parse", "preview", "components", "tokens", "test",
 					"examples", "placeholders", "tags", "gradients",
-					"register", "unregister"
+					"register", "unregister", "chat", "actionbar", "title",
 				)
 			)
 		}
 		val sub = args[0].lowercase()
-		if (sub in listOf("parse", "preview", "components", "tokens")) {
+		if (sub in listOf(
+				"parse",
+				"preview",
+				"components",
+				"tokens",
+				"chat",
+				"actionbar",
+				"title"
+			)) {
 			val suggestions = mutableListOf<String>()
 			suggestions += TextAPI.registeredPlaceholders().map { "{$it}" }
 			suggestions += listOf(

@@ -15,6 +15,13 @@ object TextAPI {
 	fun tokens(input: String) = service.tokens(input)
 
 	fun send(player: Player, input: String) = service.send(player, input)
+	fun send(player: Player, input: String, overrides: Map<String, String>) = service.send(player, input, overrides)
+
+	fun actionbar(player: Player, input: String) = service.actionbar(player, input)
+	fun actionbar(player: Player, input: String, overrides: Map<String, String>) = service.actionbar(player, input, overrides)
+
+	fun title(player: Player, input: String, subtitle: String? = null, fadein: Int = 0, stay: Int = 70, fadeout: Int = 0) = service.title(player, input, subtitle, fadein, stay, fadeout)
+	fun title(player: Player, input: String, subtitle: String? = null, fadein: Int = 0, stay: Int = 70, fadeout: Int = 0, overrides: Map<String, String>, subtitleOverrides: Map<String, String>) = service.title(player, input, subtitle, fadein, stay, fadeout, overrides, subtitleOverrides)
 
 	fun registeredPlaceholders() = service.registeredPlaceholders()
 	fun registerPlaceholder(key: String, resolver: (Player?) -> String?) = service.registerPlaceholder(key, resolver)

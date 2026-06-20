@@ -52,7 +52,7 @@ mvn clean package
 Place the generated jar inside:
 
 ```text
-/plugins/TextAPI-1.0.5.jar
+/plugins/TextAPI-1.0.6.jar
 ```
 
 Restart the server.
@@ -82,7 +82,7 @@ Dependency:
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -108,7 +108,7 @@ Dependency:
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -177,7 +177,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.nolly.mc:textapi:1.0.5'
+    compileOnly 'com.nolly.mc:textapi:1.0.6'
 }
 ```
 
@@ -198,7 +198,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.nolly.mc:textapi:1.0.5")
+    compileOnly("com.nolly.mc:textapi:1.0.6")
 }
 ```
 
