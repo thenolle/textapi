@@ -1,5 +1,5 @@
 name: TextAPI
-version: 1.0.3
+version: 1.0.4
 main: com.nolly.mc.textapi.TextAPIPlugin
 api-version: 1.21
 load: STARTUP

@@ -26,6 +26,8 @@ object TextPlaceholders {
 		registry.remove(key.trim().lowercase())
 	}
 
+	fun registered(): Set<String> = registry.keys.toSet()
+
 	fun resolve(key: String, player: Player?): String? = registry[key.trim().lowercase()]?.resolve(player)
 
 	fun keys(): Set<String> = registry.keys.toSet()

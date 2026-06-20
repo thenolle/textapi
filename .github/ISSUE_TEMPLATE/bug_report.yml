@@ -32,7 +32,7 @@ body:
     id: version
     attributes:
       label: TextAPI version
-      placeholder: 1.0.3
+      placeholder: 1.0.4
 
   - type: input
     id: mcversion

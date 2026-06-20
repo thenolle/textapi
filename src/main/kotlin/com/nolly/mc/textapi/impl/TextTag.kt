@@ -2,9 +2,46 @@ package com.nolly.mc.textapi.impl
 
 import net.md_5.bungee.api.ChatColor
 
-internal object TextTag {
 
-	private val customTags = mutableSetOf<String>()
+
+object TextTag {
+	fun interface TagHandler {
+		fun apply(style: TextStyle, args: String?): TextStyle
+	}
+
+	private val customTagHandlers = mutableMapOf<String, TagHandler>()
+
+	fun register(tag: String, handler: TagHandler) {
+		customTagHandlers[normalize(tag)] = handler
+	}
+
+	fun unregister(tag: String) {
+		customTagHandlers.remove(normalize(tag))
+	}
+
+	fun isRegistered(tag: String): Boolean = normalize(tag) in customTagHandlers
+
+	fun resolveHandler(tag: String): TagHandler? = customTagHandlers[normalize(tag)]
+
+	fun registeredTags(): Set<String> = customTagHandlers.keys.toSet()
+
+	private val customGradients = mutableMapOf<String, List<String>>()
+
+	fun registerGradient(name: String, stops: List<String>) {
+		customGradients[normalize(name)] = stops
+	}
+
+	fun unregisterGradient(name: String) {
+		customGradients.remove(normalize(name))
+	}
+
+	fun isCustomGradient(name: String): Boolean =
+		normalize(name) in customGradients
+
+	fun resolveCustomGradient(name: String): List<String>? =
+		customGradients[normalize(name)]
+
+	fun registeredGradients(): Set<String> = customGradients.keys.toSet()
 
 	private val namedColors: Map<String, ChatColor> = mapOf(
 		"black" to ChatColor.BLACK,
@@ -36,27 +73,17 @@ internal object TextTag {
 		"pan" to listOf("#FF1B8D", "#FF1B8D", "#FFD700", "#1BB3FF", "#1BB3FF"),
 		"ace" to listOf("#000000", "#A4A4A4", "#FFFFFF", "#810081"),
 		"aro" to listOf("#3DA542", "#A8D379", "#FFFFFF", "#A9A9A9", "#000000"),
+		"aroace" to listOf("#e28c00", "#eccd00", "#ffffff", "#62aedc", "#203856"),
 		"genderfluid" to listOf("#FF76A4", "#FFFFFF", "#C011D7", "#000000", "#2F3CBE"),
 		"agender" to listOf("#000000", "#B9B9B9", "#FFFFFF", "#B8F483", "#FFFFFF", "#B9B9B9", "#000000"),
 		"intersex" to listOf("#FFD800", "#FFD800", "#7902AA", "#7902AA", "#FFD800"),
 		"polyam" to listOf("#F61CB9", "#07D569", "#1C92FF"),
 		"demi" to listOf("#FFFFFF", "#FFFFFF", "#D2D2D2", "#810081"),
-		"genderqueer" to listOf("#B57EDC", "#FFFFFF", "#4A8123")
+		"genderqueer" to listOf("#B57EDC", "#FFFFFF", "#4A8123"),
+		"apogender" to listOf("#447d4b", "#a9f57a", "#000000", "#a9f57a", "#447d4b")
 	)
 
-	fun register(tag: String) {
-		customTags += normalize(tag)
-	}
-
-	fun unregister(tag: String) {
-		customTags -= normalize(tag)
-	}
-
-	fun isRegistered(tag: String): Boolean =
-		normalize(tag) in customTags
-
-	fun registered(): Set<String> =
-		customTags.toSet()
+	fun isGradientAlias(name: String): Boolean = normalize(name) in prideGradients || isCustomGradient(name)
 
 	fun resolveColor(value: String): ChatColor? {
 		val n = normalize(value)
@@ -67,20 +94,13 @@ internal object TextTag {
 		return null
 	}
 
-	fun isColorTag(name: String): Boolean =
-		normalize(name).let { namedColors.containsKey(it) }
+	fun isColorTag(name: String): Boolean = normalize(name).let { namedColors.containsKey(it) }
 
-	fun isColorAlias(name: String): Boolean =
-		normalize(name) in setOf("color", "colour", "c")
+	fun isColorAlias(name: String): Boolean = normalize(name) in setOf("color", "colour", "c")
 
-	fun isDecorationTag(name: String): Boolean =
-		normalize(name) in decorationAliases
+	fun isDecorationTag(name: String): Boolean = normalize(name) in decorationAliases
 
-	fun applyDecoration(
-		style: TextStyle,
-		name: String,
-		enabled: Boolean
-	): TextStyle = when (normalize(name)) {
+	fun applyDecoration(style: TextStyle, name: String, enabled: Boolean): TextStyle = when (normalize(name)) {
 		"bold", "b" -> style.copy(bold = enabled)
 		"italic", "em", "i" -> style.copy(italic = enabled)
 		"underlined", "underline", "u" -> style.copy(underlined = enabled)
@@ -89,8 +109,7 @@ internal object TextTag {
 		else -> style
 	}
 
-	fun normalize(s: String): String =
-		s.trim().lowercase()
+	fun normalize(s: String): String = s.trim().lowercase()
 
 	private val decorationAliases: Set<String> = setOf(
 		"bold", "b",

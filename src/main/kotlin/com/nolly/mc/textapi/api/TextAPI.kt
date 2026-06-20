@@ -1,5 +1,6 @@
 package com.nolly.mc.textapi.api
 
+import com.nolly.mc.textapi.impl.TextTag
 import org.bukkit.entity.Player
 
 object TextAPI {
@@ -15,9 +16,15 @@ object TextAPI {
 
 	fun send(player: Player, input: String) = service.send(player, input)
 
+	fun registeredPlaceholders() = service.registeredPlaceholders()
 	fun registerPlaceholder(key: String, resolver: (Player?) -> String?) = service.registerPlaceholder(key, resolver)
 	fun unregisterPlaceholder(key: String) = service.unregisterPlaceholder(key)
 
-	fun registerTag(tag: String) = service.registerTag(tag)
+	fun registeredTags() = service.registeredTags()
+	fun registerTag(tag: String, handler: TextTag.TagHandler) = service.registerTag(tag, handler)
 	fun unregisterTag(tag: String) = service.unregisterTag(tag)
+
+	fun registeredGradient() = service.registeredGradient()
+	fun registerGradient(name: String, stops: List<String>) = service.registerGradient(name, stops)
+	fun unregisterGradient(name: String) = service.unregisterGradient(name)
 }

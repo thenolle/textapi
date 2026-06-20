@@ -4,7 +4,7 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.HoverEvent
 
-internal data class TextStyle(
+data class TextStyle(
 	val color: ChatColor? = null,
 	val bold: Boolean = false,
 	val italic: Boolean = false,

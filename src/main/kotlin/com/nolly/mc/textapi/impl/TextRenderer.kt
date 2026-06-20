@@ -19,6 +19,7 @@ internal class TextRenderer {
 		data class Gradient(val colorStops: List<ChatColor>) : CollectMeta
 		data class Rainbow(val phase: Int) : CollectMeta
 		data class Pride(val palette: String) : CollectMeta
+		data class CustomGradient(val name: String) : CollectMeta
 	}
 
 	fun renderComponents(tokens: List<TextToken>, context: TextContext = TextContext()): Array<BaseComponent> {
@@ -39,7 +40,6 @@ internal class TextRenderer {
 			is Frame.Style -> top.style
 			is Frame.Collecting -> top.outerStyle
 		}
-
 		fun emit(text: String) {
 			if (text.isEmpty()) return
 			val style = currentStyle()
@@ -51,7 +51,6 @@ internal class TextRenderer {
 				output.add(Segment(text, style))
 			}
 		}
-
 		for (token in tokens) {
 			when (token) {
 				is TextToken.Text -> emit(token.value)
@@ -59,7 +58,6 @@ internal class TextRenderer {
 					val value = context.resolve(token.name) ?: "{${token.name}}"
 					emit(value)
 				}
-
 				is TextToken.OpenTag -> {
 					val name = TextTag.normalize(token.name)
 					val args = token.arguments
@@ -69,7 +67,6 @@ internal class TextRenderer {
 							frameStack.clear()
 							frameStack.addLast(Frame.Style("__root__", TextStyle()))
 						}
-
 						name == "newline" || name == "br" -> emit("\n")
 						name == "gradient" && args != null -> {
 							val stops = args.split(":").mapNotNull { TextTag.resolveColor(it.trim()) }
@@ -81,41 +78,47 @@ internal class TextRenderer {
 								emit("<${serialize(token)}>")
 							}
 						}
-
 						name == "rainbow" -> {
 							val phase = args?.toIntOrNull() ?: 0
 							val frame = Frame.Collecting(name, style, CollectMeta.Rainbow(phase))
 							frameStack.addLast(frame)
 							collectorBuffers[System.identityHashCode(frame)] = mutableListOf()
 						}
-
 						name in TextTag.prideGradients -> {
 							val frame = Frame.Collecting(name, style, CollectMeta.Pride(name))
 							frameStack.addLast(frame)
 							collectorBuffers[System.identityHashCode(frame)] = mutableListOf()
 						}
-
+						TextTag.isCustomGradient(name) -> {
+							val frame = Frame.Collecting(name, style, CollectMeta.CustomGradient(name))
+							frameStack.addLast(frame)
+							collectorBuffers[System.identityHashCode(frame)] = mutableListOf()
+						}
+						TextTag.isRegistered(name) -> {
+							val handler = TextTag.resolveHandler(name)
+							if (handler != null) {
+								frameStack.addLast(Frame.Style(name, handler.apply(style, args)))
+							} else {
+								emit("<${serialize(token)}>")
+							}
+						}
 						TextTag.isColorTag(name) && args == null -> {
 							val color = TextTag.resolveColor(name)
 							frameStack.addLast(Frame.Style(name, style.copy(color = color)))
 						}
-
 						name.startsWith("#") && name.length == 7 -> {
 							val color = TextTag.resolveColor(name)
 							if (color != null) frameStack.addLast(Frame.Style(name, style.copy(color = color)))
 							else emit("<${serialize(token)}>")
 						}
-
 						TextTag.isColorAlias(name) && args != null -> {
 							val color = TextTag.resolveColor(args)
 							if (color != null) frameStack.addLast(Frame.Style(name, style.copy(color = color)))
 							else emit("<${serialize(token)}>")
 						}
-
 						TextTag.isDecorationTag(name) -> {
 							frameStack.addLast(Frame.Style(name, TextTag.applyDecoration(style, name, true)))
 						}
-
 						name.startsWith("!") -> {
 							val inner = name.substring(1)
 							if (TextTag.isDecorationTag(inner)) {
@@ -124,27 +127,22 @@ internal class TextRenderer {
 								emit("<$name>")
 							}
 						}
-
 						name == "click" && args != null -> {
 							val event = parseClickEvent(args)
 							if (event != null) frameStack.addLast(Frame.Style(name, style.copy(clickEvent = event)))
 							else emit("<${serialize(token)}>")
 						}
-
 						name == "hover" && args != null -> {
 							val event = parseHoverEvent(args)
 							if (event != null) frameStack.addLast(Frame.Style(name, style.copy(hoverEvent = event)))
 							else emit("<${serialize(token)}>")
 						}
-
 						name == "insert" && args != null -> {
 							frameStack.addLast(Frame.Style(name, style.copy(insertion = args)))
 						}
-
 						else -> emit("<${serialize(token)}>")
 					}
 				}
-
 				is TextToken.CloseTag -> {
 					val name = TextTag.normalize(token.name)
 					val matchIdx = frameStack.indexOfLast { frame ->
@@ -199,6 +197,13 @@ internal class TextRenderer {
 				val stops = TextTag.prideGradients[meta.palette]!!
 					.mapNotNull { TextTag.resolveColor(it) }
 				expandGradient(fullText, stops, frame.outerStyle)
+			}
+			is CollectMeta.CustomGradient -> {
+				val stops = TextTag.resolveCustomGradient(meta.name)
+					?.mapNotNull { TextTag.resolveColor(it) }
+					?: emptyList()
+				if (stops.size >= 2) expandGradient(fullText, stops, frame.outerStyle)
+				else inner
 			}
 		}
 	}
@@ -318,7 +323,6 @@ internal class TextRenderer {
 				val innerComponents = renderComponents(TextParser().parse(value))
 				HoverEvent(HoverEvent.Action.SHOW_TEXT, HoverText(innerComponents))
 			}
-
 			else -> null
 		}
 	}
@@ -335,6 +339,5 @@ internal class TextRenderer {
 		return sb.toString()
 	}
 
-	private fun serialize(t: TextToken.OpenTag): String =
-		if (t.arguments.isNullOrBlank()) t.name else "${t.name}:${t.arguments}"
+	private fun serialize(t: TextToken.OpenTag): String = if (t.arguments.isNullOrBlank()) t.name else "${t.name}:${t.arguments}"
 }

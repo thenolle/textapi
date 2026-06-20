@@ -12,7 +12,7 @@
 
 TextAPI is a high-performance text formatting and parsing system for Spigot 1.21+ servers.
 
-It provides a MiniMessage-like syntax with placeholders, colors, gradients, rainbow effects, hover/click events, runtime tag registration, and a fully extensible API.
+It provides a MiniMessage-like syntax with placeholders, colors, gradients, rainbow effects, hover/click events, runtime tag and gradient registration with full handler control, and a fully extensible API.
 
 ---
 
@@ -22,18 +22,20 @@ It provides a MiniMessage-like syntax with placeholders, colors, gradients, rain
 
 * Custom tag-based parser
 * Placeholder system
-* Runtime placeholder registration
-* Runtime tag registration
+* Runtime placeholder registration/unregistration
+* Runtime tag registration with full style handler control
+* Runtime gradient registration with custom color stops
 * Click and hover events
-* Gradient rendering
-* Rainbow rendering
-* Pride gradient presets
+* Insertion events
+* Gradient rendering (2+ color stops)
+* Rainbow rendering with phase support
+* Pride gradient presets (14 built-in)
 * Token-level parser API
 * Legacy string output
 * Component output
-* Debug commands
+* Full debug command suite with live test runner
 * TPS placeholder support
-* Tab-complete enabled `/text` command
+* Tab-complete enabled `/textapi` command
 
 ---
 
@@ -50,7 +52,7 @@ mvn clean package
 Place the generated jar inside:
 
 ```text
-/plugins/TextAPI-1.0.3.jar
+/plugins/TextAPI-1.0.4.jar
 ```
 
 Restart the server.
@@ -80,7 +82,7 @@ Dependency:
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -106,7 +108,7 @@ Dependency:
 <dependency>
     <groupId>com.nolly.mc</groupId>
     <artifactId>textapi</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -175,7 +177,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.nolly.mc:textapi:1.0.3'
+    compileOnly 'com.nolly.mc:textapi:1.0.4'
 }
 ```
 
@@ -196,7 +198,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.nolly.mc:textapi:1.0.3")
+    compileOnly("com.nolly.mc:textapi:1.0.4")
 }
 ```
 
@@ -216,20 +218,48 @@ command:
 ### Main Command
 
 ```text
-/text
+/textapi
 ```
 
 ### Subcommands
 
 ```text
 /textapi parse <message>
+/textapi preview <message>
 /textapi components <message>
 /textapi tokens <message>
-/textapi placeholders
-/textapi register <key> <value>
-/textapi unregister <key>
+/textapi test
 /textapi examples
+/textapi placeholders
+/textapi tags
+/textapi gradients
+/textapi register placeholder <key> <value>
+/textapi register tag <name> <#hex|colorname> [bold] [italic] [underline] [strikethrough] [obfuscated]
+/textapi register gradient <name> <#hex1> <#hex2> [#hex3 ...]
+/textapi unregister placeholder <key>
+/textapi unregister tag <name>
+/textapi unregister gradient <name>
 ```
+
+### Command Reference
+
+| Subcommand | Description |
+|---|---|
+| `parse <msg>` | Render and send a message |
+| `preview <msg>` | Show raw input, parsed string, and live render side by side |
+| `components <msg>` | Dump each component with color and decoration flags |
+| `tokens <msg>` | Dump the token list produced by the parser |
+| `test` | Run a full in-game feature test covering every system (player only) |
+| `examples` | Print quick usage examples |
+| `placeholders` | List all registered placeholder keys |
+| `tags` | List all registered custom tags |
+| `gradients` | List all registered custom gradients with a live preview bar |
+| `register placeholder` | Register a static placeholder at runtime |
+| `register tag` | Register a custom tag with color and decoration flags |
+| `register gradient` | Register a named gradient with 2+ hex color stops |
+| `unregister placeholder` | Remove a registered placeholder |
+| `unregister tag` | Remove a registered custom tag |
+| `unregister gradient` | Remove a registered custom gradient |
 
 ---
 
@@ -242,31 +272,30 @@ command:
 <gold>Gold</gold>
 <green>Green</green>
 <#ff5500>Hex Color</#ff5500>
+<color:#aa00ff>Color Alias</color>
 ```
 
 ### Gradients
 
 ```txt
-<gradient:#ff0000:#00ff00>Gradient Text</gradient>
+<gradient:#ff0000:#00ff00>Two Stop</gradient>
+<gradient:#ff0000:#ffff00:#00ff00>Three Stop</gradient>
 ```
 
 ### Rainbow
 
 ```txt
 <rainbow>Rainbow Text</rainbow>
+<rainbow:120>Phase Shifted Rainbow</rainbow>
 ```
 
 ### Decorations
 
 ```txt
 <bold>Bold</bold>
-
 <italic>Italic</italic>
-
 <underlined>Underline</underlined>
-
 <strikethrough>Strike</strikethrough>
-
 <obfuscated>Magic</obfuscated>
 ```
 
@@ -283,47 +312,49 @@ command:
 ### Hover Events
 
 ```txt
-<hover:show_text:Hello World>
-    Hover Me
-</hover>
+<hover:show_text:Hello World>Hover Me</hover>
+<hover:show_text:<red>Danger!</red>>Hover Me</hover>
 ```
 
 ### Click Events
 
 ```txt
-<click:run_command:/spawn>
-    Run Command
-</click>
-
-<click:suggest_command:/msg >
-    Suggest Command
-</click>
-
-<click:open_url:https://example.com>
-    Open URL
-</click>
-
-<click:copy_to_clipboard:Copied Text>
-    Copy
-</click>
+<click:run_command:/spawn>Run Command</click>
+<click:suggest_command:/msg >Suggest Command</click>
+<click:open_url:https://example.com>Open URL</click>
+<click:copy_to_clipboard:Copied Text>Copy</click>
 ```
 
 ### Insertions
 
 ```txt
-<insert:Hidden Text>
-    Hover + Shift Click
-</insert>
+<insert:Hidden Text>Shift-Click Me</insert>
+```
+
+### Combined Events
+
+```txt
+<hover:show_text:<green>Go home!</green>><click:run_command:/spawn>Spawn</click></hover>
+```
+
+### Reset
+
+```txt
+<red>Red <reset>Back to default</reset>
+```
+
+### Escaping
+
+```txt
+\<red\> is not parsed as a tag
 ```
 
 ### Placeholders
 
 ```txt
 Hello {player}
-
 Online: {server_online}
-
-World: {player_world}
+TPS: {server_tps}
 ```
 
 ---
@@ -332,31 +363,18 @@ World: {player_world}
 
 ```txt
 <pride>Pride</pride>
-
 <trans>Trans</trans>
-
 <bi>Bisexual</bi>
-
 <lesbian>Lesbian</lesbian>
-
 <nonbinary>Nonbinary</nonbinary>
-
 <pan>Pansexual</pan>
-
 <ace>Asexual</ace>
-
 <aro>Aromantic</aro>
-
 <genderfluid>Genderfluid</genderfluid>
-
 <agender>Agender</agender>
-
 <intersex>Intersex</intersex>
-
 <polyam>Polyamorous</polyam>
-
 <demi>Demisexual</demi>
-
 <genderqueer>Genderqueer</genderqueer>
 ```
 
@@ -412,36 +430,25 @@ World: {player_world}
 ### Parsing
 
 ```kt
-val text = TextAPI.parse(
-	"<red>Hello {player}</red>",
-	player
-)
+val text = TextAPI.parse("<red>Hello {player}</red>", player)
 ```
 
 ### Components
 
 ```kt
-val components = TextAPI.components(
-	"<bold>Hello</bold>",
-	player
-)
+val components = TextAPI.components("<bold>Hello</bold>", player)
 ```
 
 ### Sending Messages
 
 ```kt
-TextAPI.send(
-	player,
-	"<gradient:#ff0000:#00ff00>Hello</gradient>"
-)
+TextAPI.send(player, "<gradient:#ff0000:#00ff00>Hello</gradient>")
 ```
 
 ### Tokens
 
 ```kt
-val tokens = TextAPI.tokens(
-	"<red>Hello</red>"
-)
+val tokens = TextAPI.tokens("<red>Hello</red>")
 ```
 
 ---
@@ -452,11 +459,7 @@ val tokens = TextAPI.tokens(
 
 ```kt
 TextAPI.registerPlaceholder("rank") { player ->
-	if (player?.isOp == true) {
-		"Admin"
-	} else {
-		"User"
-	}
+    if (player?.isOp == true) "Admin" else "User"
 }
 ```
 
@@ -472,53 +475,114 @@ Hello {rank}
 TextAPI.unregisterPlaceholder("rank")
 ```
 
----
-
-## Runtime Tag Registration
-
-Tags can be registered dynamically so the parser recognizes them as tags rather than placeholders.
-
-### Register
+### List (API)
 
 ```kt
-TextAPI.registerTag("mytag")
+val keys: Set<String> = TextAPI.registeredPlaceholders()
+```
+
+---
+
+## Tag Registration
+
+Tags are registered with a `TagHandler` that receives the current `TextStyle` and optional tag arguments, and returns the modified `TextStyle` to apply.
+
+### Register — simple color
+
+```kt
+TextAPI.registerTag("vip") { style, _ ->
+    style.copy(color = ChatColor.of("#ffd700"), bold = true)
+}
+```
+
+### Register — color + decorations
+
+```kt
+TextAPI.registerTag("danger") { style, _ ->
+    style.copy(color = ChatColor.RED, bold = true, italic = true)
+}
+```
+
+### Register — argument-aware
+
+```kt
+// Usage: <highlight:#ff4400>text</highlight>
+TextAPI.registerTag("highlight") { style, args ->
+    val color = args?.let { TextTag.resolveColor(it) }
+    style.copy(color = color, underlined = true)
+}
 ```
 
 Usage:
 
 ```txt
-<mytag>Hello</mytag>
+<vip>VIP Player</vip>
+<danger>Warning!</danger>
+<highlight:#ff4400>Highlighted</highlight>
 ```
 
 ### Unregister
 
 ```kt
-TextAPI.unregisterTag("mytag")
+TextAPI.unregisterTag("vip")
 ```
 
-### Check Behavior
+### List (API)
 
-Without registration:
+```kt
+val tags: Set<String> = TextAPI.registeredTags()
+```
+
+### Register via command
+
+```text
+/textapi register tag vip #ffd700 bold
+/textapi register tag danger red bold italic
+```
+
+> The command supports color + decoration flags only. For argument-aware tags, register from code.
+
+---
+
+## Gradient Registration
+
+Named gradients behave exactly like built-in pride gradients and the `<gradient>` tag — they expand per character with smooth color interpolation.
+
+### Register
+
+```kt
+TextAPI.registerGradient("sunset", listOf("#ff6600", "#ff0099", "#aa00ff"))
+TextAPI.registerGradient("ocean",  listOf("#00c6ff", "#0072ff"))
+TextAPI.registerGradient("fire",   listOf("#ff0000", "#ff6600", "#ffff00"))
+```
+
+Usage:
 
 ```txt
-<mytag>
+<sunset>Hello sunset world</sunset>
+<ocean>Deep ocean text</ocean>
 ```
 
-is treated as:
+### Unregister
 
-```txt
-{mytag}
+```kt
+TextAPI.unregisterGradient("sunset")
 ```
 
-After registration:
+### List (API)
 
-```txt
-<mytag>
+```kt
+val gradients: Set<String> = TextAPI.registeredGradient()
 ```
 
-is parsed as a tag token.
+### Register via command
 
-This allows plugin developers to build custom renderers, preprocessors, extensions, or future tag implementations without modifying TextAPI internals.
+```text
+/textapi register gradient sunset #ff6600 #ff0099 #aa00ff
+/textapi register gradient ocean #00c6ff #0072ff
+```
+
+> Minimum 2 stops. The command also renders an immediate preview bar on registration.
 
 ---
 

@@ -111,3 +111,7 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# My own runs that are local only
+.idea/runConfigurations/Server.xml
+.idea/runConfigurations/Copy.xml
